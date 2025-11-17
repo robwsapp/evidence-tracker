@@ -61,8 +61,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     checkUser()
-    fetchMyCaseClients() // Auto-load clients on page load
   }, [])
+
+  // Debounced search effect
+  useEffect(() => {
+    // Don't search if query is empty
+    if (!clientSearch || clientSearch.trim().length === 0) {
+      setMycaseClients([])
+      return
+    }
+
+    // Debounce search by 500ms
+    const timeoutId = setTimeout(() => {
+      searchMyCaseClients(clientSearch)
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [clientSearch])
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -80,23 +95,31 @@ export default function Dashboard() {
     router.push('/login')
   }
 
-  const fetchMyCaseClients = async () => {
+  const searchMyCaseClients = async (query: string) => {
     setLoadingClients(true)
     setError('')
 
     try {
-      const response = await fetch('/api/mycase/clients')
+      const response = await fetch(`/api/mycase/search-clients?query=${encodeURIComponent(query)}`)
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch clients')
+        throw new Error(data.error || 'Failed to search clients')
       }
 
       setMycaseClients(data.clients)
     } catch (err: any) {
-      setError(err.message || 'Failed to load MyCase clients')
+      setError(err.message || 'Failed to search MyCase clients')
+      setMycaseClients([])
     } finally {
       setLoadingClients(false)
+    }
+  }
+
+  const fetchMyCaseClients = async () => {
+    // Trigger search with current query
+    if (clientSearch && clientSearch.trim().length > 0) {
+      await searchMyCaseClients(clientSearch)
     }
   }
 
@@ -298,53 +321,46 @@ export default function Dashboard() {
 
               {!selectedClient ? (
                 <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Type to search clients by name or case number..."
+                    value={clientSearch}
+                    onChange={(e) => setClientSearch(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+
                   {loadingClients ? (
-                    <div className="text-center py-8">
+                    <div className="text-center py-8 bg-white rounded-xl">
                       <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
-                      <p className="mt-2 text-sm text-gray-600">Loading clients...</p>
+                      <p className="mt-2 text-sm text-gray-600">Searching...</p>
+                    </div>
+                  ) : clientSearch.trim().length === 0 ? (
+                    <div className="text-center py-8 bg-white rounded-xl">
+                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <p className="mt-2 text-sm text-gray-600">Start typing to search for clients</p>
                     </div>
                   ) : mycaseClients.length > 0 ? (
-                    <>
-                      <input
-                        type="text"
-                        placeholder="Search clients by name or case number..."
-                        value={clientSearch}
-                        onChange={(e) => setClientSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                      <div className="max-h-64 overflow-y-auto space-y-2 bg-white rounded-xl p-2">
-                        {mycaseClients
-                          .filter(client =>
-                            clientSearch === '' ||
-                            client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
-                            client.case_number.toLowerCase().includes(clientSearch.toLowerCase())
-                          )
-                          .map(client => (
-                            <button
-                              key={client.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedClient(client)
-                                setClientSearch('')
-                              }}
-                              className="w-full text-left px-4 py-3 rounded-lg hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 transition"
-                            >
-                              <p className="font-medium text-gray-900">{client.name}</p>
-                              <p className="text-sm text-gray-600">Case #{client.case_number}</p>
-                            </button>
-                          ))}
-                        {mycaseClients.filter(client =>
-                          clientSearch === '' ||
-                          client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
-                          client.case_number.toLowerCase().includes(clientSearch.toLowerCase())
-                        ).length === 0 && (
-                          <p className="text-center py-4 text-sm text-gray-500">No clients match your search</p>
-                        )}
-                      </div>
-                    </>
+                    <div className="max-h-64 overflow-y-auto space-y-2 bg-white rounded-xl p-2">
+                      {mycaseClients.map(client => (
+                        <button
+                          key={client.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedClient(client)
+                            setClientSearch('')
+                          }}
+                          className="w-full text-left px-4 py-3 rounded-lg hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 transition"
+                        >
+                          <p className="font-medium text-gray-900">{client.name}</p>
+                          <p className="text-sm text-gray-600">Case #{client.case_number}</p>
+                        </button>
+                      ))}
+                    </div>
                   ) : (
                     <div className="text-center py-8 bg-white rounded-xl">
-                      <p className="text-sm text-gray-600">Click refresh to load clients from MyCase</p>
+                      <p className="text-sm text-gray-500">No clients match your search</p>
                     </div>
                   )}
                 </div>
