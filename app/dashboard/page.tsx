@@ -59,9 +59,19 @@ export default function Dashboard() {
   const [notes, setNotes] = useState('')
   const [files, setFiles] = useState<UploadFile[]>([])
 
+  // Cache for all cases (used for case number search)
+  const [allCasesCache, setAllCasesCache] = useState<MyCaseClient[]>([])
+  const [cacheLoaded, setCacheLoaded] = useState(false)
+
   useEffect(() => {
     checkUser()
   }, [])
+
+  // Helper to detect if query looks like a case number
+  const isCaseNumberQuery = (query: string): boolean => {
+    // Contains numbers, dashes, or common case patterns
+    return /[\d-]/.test(query) || /^[A-Z]\d/.test(query)
+  }
 
   // Debounced search effect
   useEffect(() => {
@@ -73,7 +83,16 @@ export default function Dashboard() {
 
     // Debounce search by 500ms
     const timeoutId = setTimeout(() => {
-      searchMyCaseClients(clientSearch)
+      const query = clientSearch.trim()
+
+      // Detect search type
+      if (isCaseNumberQuery(query)) {
+        // Case number search - load all cases and search client-side
+        searchByCaseNumber(query)
+      } else {
+        // Name search - use fast API endpoint
+        searchByClientName(query)
+      }
     }, 500)
 
     return () => clearTimeout(timeoutId)
@@ -95,7 +114,8 @@ export default function Dashboard() {
     router.push('/login')
   }
 
-  const searchMyCaseClients = async (query: string) => {
+  // Search by client name using fast API endpoint
+  const searchByClientName = async (query: string) => {
     setLoadingClients(true)
     setError('')
 
@@ -107,9 +127,54 @@ export default function Dashboard() {
         throw new Error(data.error || 'Failed to search clients')
       }
 
-      setMycaseClients(data.clients)
+      // Fuzzy match: filter results to include query anywhere in name (case insensitive)
+      const fuzzyResults = data.clients.filter((client: MyCaseClient) =>
+        client.name.toLowerCase().includes(query.toLowerCase())
+      )
+
+      setMycaseClients(fuzzyResults)
     } catch (err: any) {
       setError(err.message || 'Failed to search MyCase clients')
+      setMycaseClients([])
+    } finally {
+      setLoadingClients(false)
+    }
+  }
+
+  // Search by case number - loads all cases and searches client-side
+  const searchByCaseNumber = async (query: string) => {
+    setLoadingClients(true)
+    setError('')
+
+    try {
+      // Load all cases if not cached
+      if (!cacheLoaded) {
+        console.log('[Search] Loading all cases for case number search...')
+        const response = await fetch('/api/mycase/clients')
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load cases')
+        }
+
+        setAllCasesCache(data.clients)
+        setCacheLoaded(true)
+
+        // Search in the newly loaded cache
+        const results = data.clients.filter((client: MyCaseClient) =>
+          client.case_number.toLowerCase().includes(query.toLowerCase())
+        )
+        setMycaseClients(results)
+      } else {
+        // Search in cached cases
+        console.log('[Search] Searching cached cases...')
+        const results = allCasesCache.filter((client: MyCaseClient) =>
+          client.case_number.toLowerCase().includes(query.toLowerCase())
+        )
+        setMycaseClients(results)
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to search by case number')
       setMycaseClients([])
     } finally {
       setLoadingClients(false)
@@ -119,7 +184,12 @@ export default function Dashboard() {
   const fetchMyCaseClients = async () => {
     // Trigger search with current query
     if (clientSearch && clientSearch.trim().length > 0) {
-      await searchMyCaseClients(clientSearch)
+      const query = clientSearch.trim()
+      if (isCaseNumberQuery(query)) {
+        await searchByCaseNumber(query)
+      } else {
+        await searchByClientName(query)
+      }
     }
   }
 
@@ -321,25 +391,41 @@ export default function Dashboard() {
 
               {!selectedClient ? (
                 <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Type to search clients by name or case number..."
-                    value={clientSearch}
-                    onChange={(e) => setClientSearch(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Search by name (maria) or case number (E20-043)..."
+                      value={clientSearch}
+                      onChange={(e) => setClientSearch(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                    {clientSearch.trim().length > 0 && (
+                      <p className="mt-1 text-xs text-gray-500">
+                        {isCaseNumberQuery(clientSearch) ? (
+                          <>🔍 Searching by case number...</>
+                        ) : (
+                          <>🔍 Searching by client name...</>
+                        )}
+                      </p>
+                    )}
+                  </div>
 
                   {loadingClients ? (
                     <div className="text-center py-8 bg-white rounded-xl">
                       <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
-                      <p className="mt-2 text-sm text-gray-600">Searching...</p>
+                      <p className="mt-2 text-sm text-gray-600">
+                        {!cacheLoaded && isCaseNumberQuery(clientSearch)
+                          ? 'Loading all cases for case number search...'
+                          : 'Searching...'}
+                      </p>
                     </div>
                   ) : clientSearch.trim().length === 0 ? (
                     <div className="text-center py-8 bg-white rounded-xl">
                       <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
-                      <p className="mt-2 text-sm text-gray-600">Start typing to search for clients</p>
+                      <p className="mt-2 text-sm text-gray-600">Start typing to search</p>
+                      <p className="mt-1 text-xs text-gray-500">Try "maria" or "E20-043"</p>
                     </div>
                   ) : mycaseClients.length > 0 ? (
                     <div className="max-h-64 overflow-y-auto space-y-2 bg-white rounded-xl p-2">
