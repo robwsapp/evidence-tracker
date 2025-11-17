@@ -50,6 +50,7 @@ export default function Dashboard() {
   const [selectedClient, setSelectedClient] = useState<MyCaseClient | null>(null)
   const [mycaseClients, setMycaseClients] = useState<MyCaseClient[]>([])
   const [loadingClients, setLoadingClients] = useState(false)
+  const [clientSearch, setClientSearch] = useState('')
   const [dateReceived, setDateReceived] = useState(new Date().toISOString().split('T')[0])
   const [numPieces, setNumPieces] = useState(1)
   const [evidenceType, setEvidenceType] = useState('Birth Certificate')
@@ -60,6 +61,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     checkUser()
+    fetchMyCaseClients() // Auto-load clients on page load
   }, [])
 
   const checkUser = async () => {
@@ -280,36 +282,70 @@ export default function Dashboard() {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Client Selection */}
             <div className="bg-emerald-50 rounded-xl p-5 border border-emerald-200">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Select Client from MyCase
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Client from MyCase
+                </label>
+                <button
+                  type="button"
+                  onClick={fetchMyCaseClients}
+                  disabled={loadingClients}
+                  className="px-3 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition disabled:opacity-50"
+                >
+                  {loadingClients ? 'Refreshing...' : 'Refresh'}
+                </button>
+              </div>
 
               {!selectedClient ? (
                 <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={fetchMyCaseClients}
-                    disabled={loadingClients}
-                    className="w-full px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition disabled:opacity-50"
-                  >
-                    {loadingClients ? 'Loading Clients...' : 'Load Clients from MyCase'}
-                  </button>
-
-                  {mycaseClients.length > 0 && (
-                    <select
-                      onChange={(e) => {
-                        const client = mycaseClients.find(c => c.id === parseInt(e.target.value))
-                        if (client) setSelectedClient(client)
-                      }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    >
-                      <option value="">Choose a client...</option>
-                      {mycaseClients.map(client => (
-                        <option key={client.id} value={client.id}>
-                          {client.name} - Case #{client.case_number}
-                        </option>
-                      ))}
-                    </select>
+                  {loadingClients ? (
+                    <div className="text-center py-8">
+                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
+                      <p className="mt-2 text-sm text-gray-600">Loading clients...</p>
+                    </div>
+                  ) : mycaseClients.length > 0 ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Search clients by name or case number..."
+                        value={clientSearch}
+                        onChange={(e) => setClientSearch(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                      <div className="max-h-64 overflow-y-auto space-y-2 bg-white rounded-xl p-2">
+                        {mycaseClients
+                          .filter(client =>
+                            clientSearch === '' ||
+                            client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+                            client.case_number.toLowerCase().includes(clientSearch.toLowerCase())
+                          )
+                          .map(client => (
+                            <button
+                              key={client.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedClient(client)
+                                setClientSearch('')
+                              }}
+                              className="w-full text-left px-4 py-3 rounded-lg hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 transition"
+                            >
+                              <p className="font-medium text-gray-900">{client.name}</p>
+                              <p className="text-sm text-gray-600">Case #{client.case_number}</p>
+                            </button>
+                          ))}
+                        {mycaseClients.filter(client =>
+                          clientSearch === '' ||
+                          client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+                          client.case_number.toLowerCase().includes(clientSearch.toLowerCase())
+                        ).length === 0 && (
+                          <p className="text-center py-4 text-sm text-gray-500">No clients match your search</p>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8 bg-white rounded-xl">
+                      <p className="text-sm text-gray-600">Click refresh to load clients from MyCase</p>
+                    </div>
                   )}
                 </div>
               ) : (
