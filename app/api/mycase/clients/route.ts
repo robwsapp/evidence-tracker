@@ -13,7 +13,7 @@ interface MyCaseTokens {
   expires_at: string
 }
 
-interface MyCaseContact {
+interface MyCaseClient {
   id: number
   first_name: string
   last_name: string
@@ -23,7 +23,8 @@ interface MyCaseCase {
   id: number
   case_number: string
   name: string
-  contacts: MyCaseContact[]
+  clients: MyCaseClient[]
+  updated_at: string
 }
 
 // Helper to refresh token if needed
@@ -130,19 +131,29 @@ export async function GET(request: NextRequest) {
 
     const cases: MyCaseCase[] = await response.json()
 
-    // Format clients for frontend
-    const clients = cases.map(caseItem => {
-      const primaryContact = caseItem.contacts?.[0]
-      const clientName = primaryContact
-        ? `${primaryContact.first_name} ${primaryContact.last_name}`
-        : caseItem.name || 'Unknown Client'
+    // Format clients for frontend, sorted by newest first
+    const clients = cases
+      .map(caseItem => {
+        // Get primary client from the clients array (not contacts)
+        const primaryClient = caseItem.clients?.[0]
+        const clientName = primaryClient
+          ? `${primaryClient.first_name || ''} ${primaryClient.last_name || ''}`.trim()
+          : 'Unknown Client'
 
-      return {
-        id: caseItem.id,
-        name: clientName,
-        case_number: caseItem.case_number,
-      }
-    })
+        return {
+          id: caseItem.id,
+          name: clientName,
+          case_number: caseItem.case_number || 'No Case Number',
+          case_name: caseItem.name, // Keep case name for search
+          updated_at: caseItem.updated_at,
+        }
+      })
+      // Sort by most recently updated first
+      .sort((a, b) => {
+        const dateA = new Date(a.updated_at || 0).getTime()
+        const dateB = new Date(b.updated_at || 0).getTime()
+        return dateB - dateA
+      })
 
     return NextResponse.json({ clients })
 
