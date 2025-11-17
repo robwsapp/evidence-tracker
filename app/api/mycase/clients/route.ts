@@ -104,10 +104,10 @@ export async function GET(request: NextRequest) {
     // Refresh token if needed
     tokens = await refreshTokenIfNeeded(tokens)
 
-    // Fetch ALL cases from MyCase API with cursor-based pagination
+    // Fetch ALL cases from MyCase API with Link header pagination
     // Use MyCase external integrations API (NOT self-hosted URL)
     let allCases: MyCaseCase[] = []
-    let nextCursor: string | null = null
+    let nextPageToken: string | null = null
     let pageCount = 0
 
     console.log('[MyCase API] Starting to fetch all cases...')
@@ -116,8 +116,10 @@ export async function GET(request: NextRequest) {
       pageCount++
       const mycaseApiUrl = new URL('https://external-integrations.mycase.com/v1/cases')
       mycaseApiUrl.searchParams.set('page_size', '100')
-      if (nextCursor) {
-        mycaseApiUrl.searchParams.set('cursor', nextCursor)
+      // Request client fields explicitly (API only returns id by default)
+      mycaseApiUrl.searchParams.set('field[client]', 'id,first_name,last_name')
+      if (nextPageToken) {
+        mycaseApiUrl.searchParams.set('page_token', nextPageToken)
       }
 
       console.log(`[MyCase API] Fetching page ${pageCount} from:`, mycaseApiUrl.toString())
@@ -130,6 +132,10 @@ export async function GET(request: NextRequest) {
       })
 
       console.log(`[MyCase API] Page ${pageCount} response status:`, response.status)
+      const itemCount = response.headers.get('Item-Count')
+      const linkHeader = response.headers.get('Link')
+      console.log(`[MyCase API] Item-Count header: ${itemCount}`)
+      console.log(`[MyCase API] Link header: ${linkHeader}`)
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -137,14 +143,22 @@ export async function GET(request: NextRequest) {
         throw new Error(`MyCase API error: ${response.status} - ${errorText}`)
       }
 
-      const data = await response.json()
-      const cases: MyCaseCase[] = data.cases || data // Handle both array and object responses
+      const cases: MyCaseCase[] = await response.json()
       allCases = allCases.concat(cases)
 
-      nextCursor = data.next_cursor || null
-      console.log(`[MyCase API] Page ${pageCount}: Fetched ${cases.length} cases, Total: ${allCases.length}, Next cursor: ${nextCursor ? 'exists' : 'none'}`)
+      // Parse Link header to get next page_token
+      // Format: <https://...?page_token=abc>; rel="next"
+      nextPageToken = null
+      if (linkHeader) {
+        const linkMatch = linkHeader.match(/<[^>]*[?&]page_token=([^&>]+)[^>]*>;\s*rel="next"/)
+        if (linkMatch) {
+          nextPageToken = linkMatch[1]
+        }
+      }
 
-    } while (nextCursor)
+      console.log(`[MyCase API] Page ${pageCount}: Fetched ${cases.length} cases, Total: ${allCases.length}, Next page token: ${nextPageToken ? 'exists' : 'none'}`)
+
+    } while (nextPageToken)
 
     console.log(`[MyCase API] Finished fetching all cases. Total: ${allCases.length} cases across ${pageCount} pages`)
 
