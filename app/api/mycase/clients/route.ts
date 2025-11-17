@@ -103,6 +103,10 @@ export async function GET(request: NextRequest) {
     tokens = await refreshTokenIfNeeded(tokens)
 
     // Fetch cases from MyCase API
+    console.log('[MyCase API] Fetching cases from MyCase...')
+    console.log('[MyCase API] Token length:', tokens.access_token.length)
+    console.log('[MyCase API] Token preview:', tokens.access_token.substring(0, 50))
+
     const response = await fetch('https://api.mycase.com/v1/cases', {
       headers: {
         'Authorization': `Bearer ${tokens.access_token}`,
@@ -110,8 +114,12 @@ export async function GET(request: NextRequest) {
       },
     })
 
+    console.log('[MyCase API] Response status:', response.status)
+    console.log('[MyCase API] Response headers:', Object.fromEntries(response.headers.entries()))
+
     if (!response.ok) {
       const errorText = await response.text()
+      console.error('[MyCase API] Error response:', errorText)
       throw new Error(`MyCase API error: ${response.status} - ${errorText}`)
     }
 
