@@ -33,7 +33,8 @@ async function refreshTokenIfNeeded(tokens: MyCaseTokens): Promise<MyCaseTokens>
 
   // Refresh if token expires in less than 5 minutes
   if (expiresAt.getTime() - now.getTime() < 5 * 60 * 1000) {
-    const response = await fetch('https://auth.mycase.com/tokens', {
+    // Use self-hosted instance for token refresh
+    const response = await fetch('https://mycase.elizabethrosariolaw.net/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -103,7 +104,8 @@ export async function GET(request: NextRequest) {
     tokens = await refreshTokenIfNeeded(tokens)
 
     // Fetch cases from MyCase API with pagination parameters
-    const mycaseApiUrl = new URL('https://api.mycase.com/v1/cases')
+    // Use custom self-hosted instance URL
+    const mycaseApiUrl = new URL('https://mycase.elizabethrosariolaw.net/api/v1/cases')
     mycaseApiUrl.searchParams.set('page', '1')
     mycaseApiUrl.searchParams.set('per_page', '100')
 
