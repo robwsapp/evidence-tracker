@@ -102,12 +102,16 @@ export async function GET(request: NextRequest) {
     // Refresh token if needed
     tokens = await refreshTokenIfNeeded(tokens)
 
-    // Fetch cases from MyCase API
-    console.log('[MyCase API] Fetching cases from MyCase...')
+    // Fetch cases from MyCase API with pagination parameters
+    const mycaseApiUrl = new URL('https://api.mycase.com/v1/cases')
+    mycaseApiUrl.searchParams.set('page', '1')
+    mycaseApiUrl.searchParams.set('per_page', '100')
+
+    console.log('[MyCase API] Fetching cases from:', mycaseApiUrl.toString())
     console.log('[MyCase API] Token length:', tokens.access_token.length)
     console.log('[MyCase API] Token preview:', tokens.access_token.substring(0, 50))
 
-    const response = await fetch('https://api.mycase.com/v1/cases', {
+    const response = await fetch(mycaseApiUrl.toString(), {
       headers: {
         'Authorization': `Bearer ${tokens.access_token}`,
         'Accept': 'application/json',
