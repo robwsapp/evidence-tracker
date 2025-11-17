@@ -264,27 +264,39 @@ export default function AdminDashboard() {
   const uniqueStaff = Array.from(new Set(logs.map(log => log.staff_email)))
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <div className="flex gap-4">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-            >
-              Back to Dashboard
-            </button>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut()
-                router.push('/login')
-              }}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-            >
-              Logout
-            </button>
+      <header className="bg-white shadow-lg border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p className="text-sm text-gray-600">Elizabeth Rosario Law</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition shadow-sm"
+              >
+                Back to Dashboard
+              </button>
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut()
+                  router.push('/login')
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition shadow-md"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -292,28 +304,55 @@ export default function AdminDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Total Evidence Logs</h3>
-            <p className="text-3xl font-bold text-gray-900">{filteredLogs.length}</p>
+          <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Total Evidence Logs</h3>
+                <p className="text-3xl font-bold text-emerald-600">{filteredLogs.length}</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
           </div>
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Total Pieces</h3>
-            <p className="text-3xl font-bold text-gray-900">{totalPieces}</p>
+          <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Total Pieces</h3>
+                <p className="text-3xl font-bold text-emerald-600">{totalPieces}</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+              </div>
+            </div>
           </div>
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Unique Clients</h3>
-            <p className="text-3xl font-bold text-gray-900">{totalClients}</p>
+          <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Unique Clients</h3>
+                <p className="text-3xl font-bold text-emerald-600">{totalClients}</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white shadow rounded-lg p-6 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Filters & Search</h2>
-            <div className="flex gap-2">
+        <div className="bg-white shadow-xl rounded-2xl p-6 mb-8 border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Filters & Search</h2>
+            <div className="flex gap-3">
               <button
                 onClick={exportToCSV}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"
+                className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 text-sm font-medium shadow-md transition"
               >
                 Export to CSV
               </button>
@@ -327,7 +366,7 @@ export default function AdminDashboard() {
                   setStartDate('')
                   setEndDate('')
                 }}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm font-medium"
+                className="px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 text-sm font-medium shadow-md transition"
               >
                 Clear Filters
               </button>
@@ -340,7 +379,7 @@ export default function AdminDashboard() {
               placeholder="Search client name..."
               value={searchClient}
               onChange={(e) => setSearchClient(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
             />
 
             <input
@@ -348,13 +387,13 @@ export default function AdminDashboard() {
               placeholder="Search case number..."
               value={searchCaseNumber}
               onChange={(e) => setSearchCaseNumber(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
             />
 
             <select
               value={filterEvidenceType}
               onChange={(e) => setFilterEvidenceType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
             >
               <option value="">All Evidence Types</option>
               {uniqueEvidenceTypes.map(type => (
@@ -365,7 +404,7 @@ export default function AdminDashboard() {
             <select
               value={filterSource}
               onChange={(e) => setFilterSource(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
             >
               <option value="">All Sources</option>
               {uniqueSources.map(source => (
@@ -376,7 +415,7 @@ export default function AdminDashboard() {
             <select
               value={filterStaff}
               onChange={(e) => setFilterStaff(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
             >
               <option value="">All Staff</option>
               {uniqueStaff.map(staff => (
@@ -390,21 +429,21 @@ export default function AdminDashboard() {
                 placeholder="Start Date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
               />
               <input
                 type="date"
                 placeholder="End Date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
               />
             </div>
           </div>
         </div>
 
         {/* Evidence Logs Table */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-8 text-center text-gray-500">Loading...</div>
@@ -412,10 +451,10 @@ export default function AdminDashboard() {
               <div className="p-8 text-center text-gray-500">No evidence logs found</div>
             ) : (
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-emerald-50">
                   <tr>
                     <th
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                      className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider cursor-pointer hover:bg-emerald-100 transition"
                       onClick={() => {
                         setSortBy('date_received')
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -424,7 +463,7 @@ export default function AdminDashboard() {
                       Date Received {sortBy === 'date_received' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
                     <th
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                      className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider cursor-pointer hover:bg-emerald-100 transition"
                       onClick={() => {
                         setSortBy('client_name')
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -432,14 +471,14 @@ export default function AdminDashboard() {
                     >
                       Client {sortBy === 'client_name' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider">
                       Case Number
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider">
                       Evidence Type
                     </th>
                     <th
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                      className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider cursor-pointer hover:bg-emerald-100 transition"
                       onClick={() => {
                         setSortBy('num_pieces')
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -447,20 +486,20 @@ export default function AdminDashboard() {
                     >
                       Pieces {sortBy === 'num_pieces' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider">
                       Source
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider">
                       Staff
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50">
+                    <tr key={log.id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {log.date_received}
                       </td>
@@ -486,7 +525,7 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => downloadFolder(log.client_name, log.case_number)}
                           disabled={downloadingFolder === `${log.client_name}-${log.case_number}`}
-                          className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
+                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
                           {downloadingFolder === `${log.client_name}-${log.case_number}`
                             ? 'Downloading...'
