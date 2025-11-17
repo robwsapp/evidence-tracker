@@ -221,43 +221,34 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Evidence Tracker</h1>
-                <p className="text-sm text-gray-500">Log New Evidence</p>
+                <h1 className="text-lg font-bold text-gray-900">Evidence Tracker</h1>
+                <p className="text-xs text-gray-500">Log Evidence</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="text-right mr-4">
-                <p className="text-sm font-medium text-gray-900">{userEmail}</p>
-                <p className="text-xs text-gray-500">Staff Member</p>
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-700">{userEmail}</span>
               <button
                 onClick={() => router.push('/admin')}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
-                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Admin Dashboard
+                Admin
               </button>
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition"
+                className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
               >
-                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
                 Logout
               </button>
             </div>
@@ -269,80 +260,39 @@ export default function Dashboard() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Success/Error Messages */}
         {success && (
-          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 p-4 shadow-sm animate-in fade-in slide-in-from-top-5">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-green-800">{success}</p>
-              </div>
-            </div>
+          <div className="mb-4 rounded-md bg-green-50 border border-green-200 p-3">
+            <p className="text-sm text-green-800">{success}</p>
           </div>
         )}
 
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 shadow-sm animate-in fade-in slide-in-from-top-5">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-red-800">{error}</p>
-              </div>
-              <button onClick={() => setError('')} className="ml-auto">
-                <svg className="h-5 w-5 text-red-400 hover:text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
+          <div className="mb-4 rounded-md bg-red-50 border border-red-200 p-3">
+            <p className="text-sm text-red-800">{error}</p>
           </div>
         )}
 
-        <div className="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-            <h2 className="text-xl font-bold text-white">Log New Evidence</h2>
-            <p className="text-blue-100 text-sm mt-1">Record evidence received from clients</p>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-semibold text-gray-900">Log New Evidence</h2>
+            <p className="text-sm text-gray-600 mt-0.5">Record evidence received from clients</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
             {/* Client Selection */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-              <label className="block text-sm font-semibold text-gray-900 mb-3">
-                <svg className="inline h-5 w-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 Select Client from MyCase
               </label>
 
               {!selectedClient ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <button
                     type="button"
                     onClick={fetchMyCaseClients}
                     disabled={loadingClients}
-                    className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition shadow-md hover:shadow-lg"
+                    className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {loadingClients ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Loading Clients...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        Load Clients from MyCase
-                      </>
-                    )}
+                    {loadingClients ? 'Loading...' : 'Load Clients from MyCase'}
                   </button>
 
                   {mycaseClients.length > 0 && (
@@ -351,7 +301,7 @@ export default function Dashboard() {
                         const client = mycaseClients.find(c => c.id === parseInt(e.target.value))
                         if (client) setSelectedClient(client)
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Choose a client...</option>
                       {mycaseClients.map(client => (
@@ -363,22 +313,15 @@ export default function Dashboard() {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center justify-between bg-white rounded-lg p-4 border-2 border-green-300 shadow-sm">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">{selectedClient.name}</p>
-                      <p className="text-sm text-gray-600">Case #{selectedClient.case_number}</p>
-                    </div>
+                <div className="flex items-center justify-between bg-white rounded-md p-3 border border-green-300">
+                  <div>
+                    <p className="font-medium text-gray-900">{selectedClient.name}</p>
+                    <p className="text-sm text-gray-600">Case #{selectedClient.case_number}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelectedClient(null)}
-                    className="text-sm text-red-600 hover:text-red-800 font-medium"
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
                     Change
                   </button>
@@ -387,10 +330,10 @@ export default function Dashboard() {
             </div>
 
             {/* Evidence Details Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Date Received */}
               <div>
-                <label htmlFor="dateReceived" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="dateReceived" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Date Received
                 </label>
                 <input
@@ -399,13 +342,13 @@ export default function Dashboard() {
                   value={dateReceived}
                   onChange={(e) => setDateReceived(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               {/* Number of Pieces */}
               <div>
-                <label htmlFor="numPieces" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="numPieces" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Number of Pieces
                 </label>
                 <input
@@ -415,13 +358,13 @@ export default function Dashboard() {
                   value={numPieces}
                   onChange={(e) => setNumPieces(parseInt(e.target.value))}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               {/* Evidence Type */}
               <div>
-                <label htmlFor="evidenceType" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="evidenceType" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Evidence Type
                 </label>
                 <select
@@ -429,7 +372,7 @@ export default function Dashboard() {
                   value={evidenceType}
                   onChange={(e) => setEvidenceType(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {EVIDENCE_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -443,14 +386,14 @@ export default function Dashboard() {
                     value={customEvidenceType}
                     onChange={(e) => setCustomEvidenceType(e.target.value)}
                     required
-                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 )}
               </div>
 
               {/* Source */}
               <div>
-                <label htmlFor="source" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Source
                 </label>
                 <select
@@ -458,7 +401,7 @@ export default function Dashboard() {
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {SOURCES.map(src => (
                     <option key={src} value={src}>{src}</option>
@@ -469,7 +412,7 @@ export default function Dashboard() {
 
             {/* Notes */}
             <div>
-              <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Notes (Optional)
               </label>
               <textarea
@@ -477,45 +420,39 @@ export default function Dashboard() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                placeholder="Add any additional notes about this evidence..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                placeholder="Add any additional notes..."
               />
             </div>
 
             {/* File Upload */}
-            <div className="bg-gray-50 rounded-xl p-6 border-2 border-dashed border-gray-300">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                <svg className="inline h-5 w-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-300">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Upload Evidence Files
               </label>
               <input
                 type="file"
                 multiple
                 onChange={handleFileSelect}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
 
               {files.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Files to Upload ({files.length}):</p>
+                <div className="mt-3 space-y-2">
+                  <p className="text-sm font-medium text-gray-700">Files ({files.length}):</p>
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {files.map((file, index) => (
-                      <div key={index} className="flex gap-2 items-center bg-white p-3 rounded-lg border border-gray-200">
-                        <svg className="h-5 w-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                      <div key={index} className="flex gap-2 items-center bg-white p-2 rounded-md border border-gray-200">
                         <input
                           type="text"
                           value={file.customName}
                           onChange={(e) => updateFileName(index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
-                          className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium transition flex-shrink-0"
+                          className="px-2 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
                         >
                           Remove
                         </button>
@@ -527,27 +464,22 @@ export default function Dashboard() {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center px-6 py-4 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-lg hover:shadow-xl"
+                className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Submitting Evidence...
+                    Submitting...
                   </>
                 ) : (
-                  <>
-                    <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Log Evidence
-                  </>
+                  'Log Evidence'
                 )}
               </button>
             </div>
