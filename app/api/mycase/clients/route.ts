@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 interface MyCaseTokens {
   access_token: string
@@ -52,7 +56,17 @@ async function refreshTokenIfNeeded(tokens: MyCaseTokens): Promise<MyCaseTokens>
       expires_at: new Date(Date.now() + data.expires_in * 1000).toISOString(),
     }
 
-    // TODO: Save updated tokens
+    // Save updated tokens to Supabase
+    await supabase
+      .from('mycase_oauth_tokens')
+      .update({
+        access_token: newTokens.access_token,
+        refresh_token: newTokens.refresh_token,
+        expires_at: newTokens.expires_at,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', (await supabase.from('mycase_oauth_tokens').select('id').single()).data?.id)
+
     return newTokens
   }
 
@@ -61,18 +75,28 @@ async function refreshTokenIfNeeded(tokens: MyCaseTokens): Promise<MyCaseTokens>
 
 export async function GET(request: NextRequest) {
   try {
-    // Read tokens from mycase_tokens.json (from parent mycase-document-downloader project)
-    const tokensPath = join(process.cwd(), '..', 'mycase-document-downloader', 'mycase_tokens.json')
+    // Read tokens from Supabase
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('mycase_oauth_tokens')
+      .select('*')
+      .single()
 
-    if (!existsSync(tokensPath)) {
+    if (tokenError || !tokenData) {
       return NextResponse.json(
-        { error: 'MyCase tokens not found. Please complete OAuth flow first.' },
-        { status: 404 }
+        {
+          error: 'MyCase not connected. Please connect your MyCase account first.',
+          needsOAuth: true,
+          oauthUrl: '/api/mycase/oauth/start'
+        },
+        { status: 401 }
       )
     }
 
-    const tokensData = readFileSync(tokensPath, 'utf-8')
-    let tokens: MyCaseTokens = JSON.parse(tokensData)
+    let tokens: MyCaseTokens = {
+      access_token: tokenData.access_token,
+      refresh_token: tokenData.refresh_token,
+      expires_at: tokenData.expires_at,
+    }
 
     // Refresh token if needed
     tokens = await refreshTokenIfNeeded(tokens)
@@ -86,7 +110,8 @@ export async function GET(request: NextRequest) {
     })
 
     if (!response.ok) {
-      throw new Error(`MyCase API error: ${response.statusText}`)
+      const errorText = await response.text()
+      throw new Error(`MyCase API error: ${response.status} - ${errorText}`)
     }
 
     const cases: MyCaseCase[] = await response.json()
