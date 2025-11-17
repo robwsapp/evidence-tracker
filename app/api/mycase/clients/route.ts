@@ -32,7 +32,7 @@ async function refreshTokenIfNeeded(tokens: MyCaseTokens): Promise<MyCaseTokens>
 
   // Refresh if token expires in less than 5 minutes
   if (expiresAt.getTime() - now.getTime() < 5 * 60 * 1000) {
-    const response = await fetch('https://api.mycase.com/oauth/token', {
+    const response = await fetch('https://auth.mycase.com/tokens', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

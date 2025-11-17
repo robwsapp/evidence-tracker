@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange code for tokens
-    const tokenResponse = await fetch('https://api.mycase.com/oauth/token', {
+    const tokenResponse = await fetch('https://auth.mycase.com/tokens', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,9 +43,9 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify({
         grant_type: 'authorization_code',
         code,
+        redirect_uri: redirectUri,
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: redirectUri,
       }),
     })
 

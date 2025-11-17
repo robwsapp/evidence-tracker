@@ -11,11 +11,10 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const authUrl = new URL('https://api.mycase.com/oauth/authorize')
+  const authUrl = new URL('https://auth.mycase.com/login_sessions/new')
   authUrl.searchParams.set('response_type', 'code')
   authUrl.searchParams.set('client_id', clientId)
   authUrl.searchParams.set('redirect_uri', redirectUri)
-  authUrl.searchParams.set('scope', 'read write')
 
   return NextResponse.redirect(authUrl.toString())
 }
