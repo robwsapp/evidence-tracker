@@ -104,35 +104,52 @@ export async function GET(request: NextRequest) {
     // Refresh token if needed
     tokens = await refreshTokenIfNeeded(tokens)
 
-    // Fetch cases from MyCase API with pagination parameters
+    // Fetch ALL cases from MyCase API with cursor-based pagination
     // Use MyCase external integrations API (NOT self-hosted URL)
-    const mycaseApiUrl = new URL('https://external-integrations.mycase.com/v1/cases')
-    mycaseApiUrl.searchParams.set('page_size', '100')
+    let allCases: MyCaseCase[] = []
+    let nextCursor: string | null = null
+    let pageCount = 0
 
-    console.log('[MyCase API] Fetching cases from:', mycaseApiUrl.toString())
-    console.log('[MyCase API] Token length:', tokens.access_token.length)
-    console.log('[MyCase API] Token preview:', tokens.access_token.substring(0, 50))
+    console.log('[MyCase API] Starting to fetch all cases...')
 
-    const response = await fetch(mycaseApiUrl.toString(), {
-      headers: {
-        'Authorization': `Bearer ${tokens.access_token}`,
-        'Accept': 'application/json',
-      },
-    })
+    do {
+      pageCount++
+      const mycaseApiUrl = new URL('https://external-integrations.mycase.com/v1/cases')
+      mycaseApiUrl.searchParams.set('page_size', '100')
+      if (nextCursor) {
+        mycaseApiUrl.searchParams.set('cursor', nextCursor)
+      }
 
-    console.log('[MyCase API] Response status:', response.status)
-    console.log('[MyCase API] Response headers:', Object.fromEntries(response.headers.entries()))
+      console.log(`[MyCase API] Fetching page ${pageCount} from:`, mycaseApiUrl.toString())
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('[MyCase API] Error response:', errorText)
-      throw new Error(`MyCase API error: ${response.status} - ${errorText}`)
-    }
+      const response = await fetch(mycaseApiUrl.toString(), {
+        headers: {
+          'Authorization': `Bearer ${tokens.access_token}`,
+          'Accept': 'application/json',
+        },
+      })
 
-    const cases: MyCaseCase[] = await response.json()
+      console.log(`[MyCase API] Page ${pageCount} response status:`, response.status)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[MyCase API] Error response:', errorText)
+        throw new Error(`MyCase API error: ${response.status} - ${errorText}`)
+      }
+
+      const data = await response.json()
+      const cases: MyCaseCase[] = data.cases || data // Handle both array and object responses
+      allCases = allCases.concat(cases)
+
+      nextCursor = data.next_cursor || null
+      console.log(`[MyCase API] Page ${pageCount}: Fetched ${cases.length} cases, Total: ${allCases.length}, Next cursor: ${nextCursor ? 'exists' : 'none'}`)
+
+    } while (nextCursor)
+
+    console.log(`[MyCase API] Finished fetching all cases. Total: ${allCases.length} cases across ${pageCount} pages`)
 
     // Format clients for frontend, sorted by newest first
-    const clients = cases
+    const clients = allCases
       .map(caseItem => {
         // Get primary client from the clients array (not contacts)
         const primaryClient = caseItem.clients?.[0]
