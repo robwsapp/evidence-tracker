@@ -48,53 +48,75 @@ export async function GET(request: NextRequest) {
 
     const tokens = await tokenResponse.json()
 
-    // Get the session from cookies using the anon client
+    // Get ALL cookies and find Supabase auth tokens
     const cookieStore = request.cookies
-    const accessToken = cookieStore.get('sb-humvvanizmkssuzsueet-auth-token')
+    const allCookies = cookieStore.getAll()
 
-    if (!accessToken) {
-      return NextResponse.redirect(
-        new URL('/login?google_error=not_logged_in', request.url)
-      )
-    }
-
-    // Create a client with the user's token to get their ID
-    const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken.value)
-
-    if (userError || !user) {
-      return NextResponse.redirect(
-        new URL('/login?google_error=not_logged_in', request.url)
-      )
-    }
-
-    // Calculate expiration time
-    const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
-
-    // Save tokens to database (upsert based on user_id) using service role to bypass RLS
-    const { error: dbError } = await supabase
-      .from('google_oauth_tokens')
-      .upsert({
-        user_id: user.id,
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_at: expiresAt,
-        scope: tokens.scope,
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id'
-      })
-
-    if (dbError) {
-      console.error('[Google OAuth] Database error:', dbError)
-      throw new Error('Failed to save tokens')
-    }
-
-    console.log('[Google OAuth] Successfully connected Google Drive')
-
-    // Redirect back to dashboard with success
-    return NextResponse.redirect(
-      new URL('/dashboard?google_connected=true', request.url)
+    // Find the auth token cookie (format: sb-<project-ref>-auth-token)
+    const authTokenCookie = allCookies.find(cookie =>
+      cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')
     )
+
+    if (!authTokenCookie) {
+      console.error('[Google OAuth] No auth token cookie found')
+      console.error('[Google OAuth] Available cookies:', allCookies.map(c => c.name))
+      return NextResponse.redirect(
+        new URL('/login?google_error=not_logged_in', request.url)
+      )
+    }
+
+    console.log('[Google OAuth] Found auth cookie:', authTokenCookie.name)
+
+    // Parse the JWT token to get user ID (tokens are JWTs with user info)
+    try {
+      const tokenParts = authTokenCookie.value.split('.')
+      if (tokenParts.length !== 3) {
+        throw new Error('Invalid token format')
+      }
+
+      const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
+      const userId = payload.sub
+
+      if (!userId) {
+        throw new Error('No user ID in token')
+      }
+
+      console.log('[Google OAuth] Extracted user ID:', userId)
+
+      // Calculate expiration time
+      const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+
+      // Save tokens to database (upsert based on user_id) using service role to bypass RLS
+      const { error: dbError } = await supabase
+        .from('google_oauth_tokens')
+        .upsert({
+          user_id: userId,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          expires_at: expiresAt,
+          scope: tokens.scope,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
+        })
+
+      if (dbError) {
+        console.error('[Google OAuth] Database error:', dbError)
+        throw new Error('Failed to save tokens')
+      }
+
+      console.log('[Google OAuth] Successfully connected Google Drive')
+
+      // Redirect back to dashboard with success
+      return NextResponse.redirect(
+        new URL('/dashboard?google_connected=true', request.url)
+      )
+    } catch (parseError: any) {
+      console.error('[Google OAuth] Error parsing auth token:', parseError)
+      return NextResponse.redirect(
+        new URL('/login?google_error=invalid_session', request.url)
+      )
+    }
 
   } catch (err: any) {
     console.error('[Google OAuth] Error:', err)
