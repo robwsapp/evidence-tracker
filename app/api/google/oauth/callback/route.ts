@@ -63,7 +63,8 @@ export async function GET(request: NextRequest) {
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 
     // Save tokens to database (upsert based on user_id) using service role to bypass RLS
-    const { error: dbError } = await supabase
+    console.log('[Google OAuth] Attempting to save tokens for user:', userId)
+    const { data: savedData, error: dbError } = await supabase
       .from('google_oauth_tokens')
       .upsert({
         user_id: userId,
@@ -75,11 +76,14 @@ export async function GET(request: NextRequest) {
       }, {
         onConflict: 'user_id'
       })
+      .select()
 
     if (dbError) {
-      console.error('[Google OAuth] Database error:', dbError)
-      throw new Error('Failed to save tokens')
+      console.error('[Google OAuth] Database error details:', JSON.stringify(dbError, null, 2))
+      throw new Error(`Failed to save tokens: ${dbError.message || JSON.stringify(dbError)}`)
     }
+
+    console.log('[Google OAuth] Tokens saved successfully:', savedData)
 
     console.log('[Google OAuth] Successfully connected Google Drive for user:', userId)
 
