@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import GoogleDriveFolderPicker from '@/components/GoogleDriveFolderPicker'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +17,12 @@ interface UploadFile {
   file: File
   customName: string
   originalName: string
+}
+
+interface GoogleDriveFolder {
+  id: string
+  name: string
+  modifiedTime: string
 }
 
 const EVIDENCE_TYPES = [
@@ -62,6 +69,10 @@ export default function Dashboard() {
   // Cache for all cases (used for case number search)
   const [allCasesCache, setAllCasesCache] = useState<MyCaseClient[]>([])
   const [cacheLoaded, setCacheLoaded] = useState(false)
+
+  // Google Drive state
+  const [showFolderPicker, setShowFolderPicker] = useState(false)
+  const [selectedFolder, setSelectedFolder] = useState<GoogleDriveFolder | null>(null)
 
   useEffect(() => {
     checkUser()
@@ -239,13 +250,17 @@ export default function Dashboard() {
         throw new Error('Please select a client')
       }
 
+      if (!selectedFolder) {
+        throw new Error('Please select a Google Drive folder')
+      }
+
       if (files.length === 0) {
         throw new Error('Please upload at least one file')
       }
 
       const finalEvidenceType = evidenceType === 'Other' ? customEvidenceType : evidenceType
 
-      // Create evidence log
+      // Create evidence log in database
       const { data: logData, error: logError } = await supabase
         .from('evidence_logs')
         .insert({
@@ -264,39 +279,52 @@ export default function Dashboard() {
 
       if (logError) throw logError
 
-      // Upload files to Supabase Storage
-      const folderPath = `${selectedClient.name}-${selectedClient.case_number}`
+      // Upload files to Google Drive
+      const uploadedFiles = []
 
       for (const uploadFile of files) {
-        const filePath = `${folderPath}/${uploadFile.customName}`
+        console.log(`Uploading ${uploadFile.customName} to Google Drive folder ${selectedFolder.name}...`)
 
-        const { error: uploadError } = await supabase.storage
-          .from('evidence-files')
-          .upload(filePath, uploadFile.file, {
-            cacheControl: '3600',
-            upsert: false
-          })
+        const formData = new FormData()
+        formData.append('file', uploadFile.file)
+        formData.append('folderId', selectedFolder.id)
+        formData.append('fileName', uploadFile.customName)
 
-        if (uploadError) throw uploadError
+        const uploadResponse = await fetch('/api/google/drive/upload', {
+          method: 'POST',
+          body: formData,
+        })
 
-        // Save file record to database
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json()
+          throw new Error(errorData.error || 'Failed to upload file to Google Drive')
+        }
+
+        const uploadResult = await uploadResponse.json()
+        uploadedFiles.push(uploadResult.file)
+
+        // Save file record to database (with Google Drive file ID and link)
         const { error: fileError } = await supabase
           .from('evidence_files')
           .insert({
             evidence_log_id: logData.id,
             file_name: uploadFile.customName,
-            file_path: filePath,
+            file_path: uploadResult.file.webViewLink || '',
             file_size: uploadFile.file.size,
             original_name: uploadFile.originalName
           })
 
-        if (fileError) throw fileError
+        if (fileError) {
+          console.error('Failed to save file record:', fileError)
+          // Don't throw error - file was uploaded successfully to Drive
+        }
       }
 
-      setSuccess('Evidence logged successfully!')
+      setSuccess(`Evidence logged successfully! ${uploadedFiles.length} file(s) uploaded to ${selectedFolder.name}`)
 
       // Reset form
       setSelectedClient(null)
+      setSelectedFolder(null)
       setDateReceived(new Date().toISOString().split('T')[0])
       setNumPieces(1)
       setEvidenceType('Birth Certificate')
@@ -601,6 +629,52 @@ export default function Dashboard() {
               )}
             </div>
 
+            {/* Google Drive Folder Selection */}
+            <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Google Drive Folder
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowFolderPicker(true)}
+                  className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition"
+                >
+                  Browse Drive
+                </button>
+              </div>
+
+              {selectedFolder ? (
+                <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-blue-300 shadow-sm">
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-8 h-8 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.71 3.5L1.15 15L4.58 21L11.14 9.5L7.71 3.5M8.29 3.5L11.71 9.5L18.29 9.5L14.86 3.5M8.29 20.5L11.71 14.5L18.29 14.5L14.86 20.5M14.86 3.5L18.29 9.5L21.71 15L18.29 20.5L14.86 14.5L11.43 20.5L7.71 15" />
+                    </svg>
+                    <div>
+                      <p className="font-medium text-gray-900">{selectedFolder.name}</p>
+                      <p className="text-xs text-gray-500">Selected folder</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFolder(null)}
+                    className="text-gray-400 hover:text-red-600 transition"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center py-6 bg-white rounded-xl">
+                  <svg className="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                  </svg>
+                  <p className="text-sm text-gray-600">Click "Browse Drive" to select a folder</p>
+                </div>
+              )}
+            </div>
+
             {/* Submit Button */}
             <div className="pt-2">
               <button
@@ -624,6 +698,14 @@ export default function Dashboard() {
           </form>
         </div>
       </main>
+
+      {/* Google Drive Folder Picker Modal */}
+      <GoogleDriveFolderPicker
+        isOpen={showFolderPicker}
+        onClose={() => setShowFolderPicker(false)}
+        onSelectFolder={(folder) => setSelectedFolder(folder)}
+        selectedFolderId={selectedFolder?.id}
+      />
     </div>
   )
 }

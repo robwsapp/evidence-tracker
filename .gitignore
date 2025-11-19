@@ -35,3 +35,6 @@ next-env.d.ts
 
 # mycase tokens
 mycase_tokens.json
+
+# google credentials
+credentials.json
