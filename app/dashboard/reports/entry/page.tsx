@@ -140,47 +140,47 @@ export default function DailyStatsEntryPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Daily Stats Entry</h1>
-          <p className="text-gray-600 mt-1">Enter daily statistics for reporting</p>
+      <div className="p-4">
+        <div className="mb-3">
+          <h1 className="text-2xl font-bold text-gray-900">Daily Stats Entry</h1>
+          <p className="text-sm text-gray-600">Enter daily statistics for reporting</p>
         </div>
 
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm p-4">
           {success && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-sm text-green-800">{success}</p>
             </div>
           )}
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">
                 Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
                 value={stat.stat_date}
                 onChange={(e) => setStat({ ...stat, stat_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             {/* Evidence Processing Section */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Evidence Processing</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="border-t pt-3">
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Evidence Processing</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     Evidence Processed
                   </label>
                   <input
@@ -188,11 +188,11 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.evidence_processed}
                     onChange={(e) => handleNumberChange('evidence_processed', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     Cases Completed
                   </label>
                   <input
@@ -200,18 +200,18 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.evidence_completed}
                     onChange={(e) => handleNumberChange('evidence_completed', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
             </div>
 
             {/* Fingerprinting Section */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Fingerprinting</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="border-t pt-3">
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Fingerprinting</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     Total FP Mail
                   </label>
                   <input
@@ -219,11 +219,11 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.fp_mail_total}
                     onChange={(e) => handleNumberChange('fp_mail_total', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     Total FP Walk In
                   </label>
                   <input
@@ -231,11 +231,11 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.fp_walk_in_total}
                     onChange={(e) => handleNumberChange('fp_walk_in_total', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     Unsigned + FP Mail Back
                   </label>
                   <input
@@ -243,11 +243,11 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.fp_unsigned_mail_back}
                     onChange={(e) => handleNumberChange('fp_unsigned_mail_back', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     FBI Results
                   </label>
                   <input
@@ -255,11 +255,11 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.fbi_results}
                     onChange={(e) => handleNumberChange('fbi_results', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-0.5">
                     FBI E-Requests
                   </label>
                   <input
@@ -267,39 +267,39 @@ export default function DailyStatsEntryPage() {
                     min="0"
                     value={stat.fbi_e_requests}
                     onChange={(e) => handleNumberChange('fbi_e_requests', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
             </div>
 
             {/* Notes */}
-            <div className="border-t pt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="border-t pt-3">
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">
                 Notes
               </label>
               <textarea
                 value={stat.notes}
                 onChange={(e) => setStat({ ...stat, notes: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={2}
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Add any notes about today's work..."
               />
             </div>
 
             {/* Submit Button */}
-            <div className="flex space-x-4">
+            <div className="flex space-x-3 pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {loading ? 'Saving...' : 'Save Daily Stats'}
               </button>
               <button
                 type="button"
                 onClick={() => router.push('/reports')}
-                className="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               >
                 Cancel
               </button>

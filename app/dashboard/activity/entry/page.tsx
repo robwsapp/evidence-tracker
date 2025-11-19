@@ -126,31 +126,31 @@ export default function ActivityEntryPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Add Activity Log Entry</h1>
-          <p className="text-gray-600 mt-1">Record new FBI results or case processing activities</p>
+      <div className="p-4">
+        <div className="mb-3">
+          <h1 className="text-2xl font-bold text-gray-900">Add Activity Log Entry</h1>
+          <p className="text-sm text-gray-600">Record new FBI results or case processing activities</p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm p-4">
           {success && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-sm text-green-800">{success}</p>
             </div>
           )}
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Client and Case Info */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
                   Client Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -158,127 +158,49 @@ export default function ActivityEntryPage() {
                   required
                   value={formData.client_name}
                   onChange={(e) => setFormData({...formData, client_name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., ESTRADA CASTILLO, Maria"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
                   Case Number
                 </label>
                 <input
                   type="text"
                   value={formData.case_number}
                   onChange={(e) => setFormData({...formData, case_number: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., 25-1595"
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Case Type <span className="text-red-500">*</span>
-              </label>
-              <select
-                required
-                value={formData.case_type}
-                onChange={(e) => setFormData({...formData, case_type: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {CASE_TYPES.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Dates */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date Received <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={formData.date_received}
-                  onChange={(e) => setFormData({...formData, date_received: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date Processed
-                </label>
-                <input
-                  type="date"
-                  value={formData.date_processed}
-                  onChange={(e) => setFormData({...formData, date_processed: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Source and Handler */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Source <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                  Case Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
-                  value={formData.source}
-                  onChange={(e) => setFormData({...formData, source: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.case_type}
+                  onChange={(e) => setFormData({...formData, case_type: e.target.value})}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {SOURCES.map(source => (
-                    <option key={source} value={source}>{source}</option>
+                  {CASE_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Handler <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.handler}
-                  onChange={(e) => setFormData({...formData, handler: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Astrid"
-                />
-              </div>
-            </div>
-
-            {/* Description and Activity Type */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., FBI Results - No Prior Arrest"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
                   Activity Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
                   value={formData.activity_type}
                   onChange={(e) => setFormData({...formData, activity_type: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {ACTIVITY_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -287,47 +209,121 @@ export default function ActivityEntryPage() {
               </div>
             </div>
 
-            {/* Flag */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="flag"
-                checked={formData.flag}
-                onChange={(e) => setFormData({...formData, flag: e.target.checked})}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="flag" className="ml-2 block text-sm text-gray-900">
-                Flag this entry for follow-up
-              </label>
+            {/* Dates */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                  Date Received <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={formData.date_received}
+                  onChange={(e) => setFormData({...formData, date_received: e.target.value})}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                  Date Processed
+                </label>
+                <input
+                  type="date"
+                  value={formData.date_processed}
+                  onChange={(e) => setFormData({...formData, date_processed: e.target.value})}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                  Source <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={formData.source}
+                  onChange={(e) => setFormData({...formData, source: e.target.value})}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {SOURCES.map(source => (
+                    <option key={source} value={source}>{source}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                  Handler <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.handler}
+                  onChange={(e) => setFormData({...formData, handler: e.target.value})}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., Astrid"
+                />
+              </div>
             </div>
 
-            {/* Notes */}
+            {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                Description <span className="text-red-500">*</span>
               </label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Additional notes..."
+              <input
+                type="text"
+                required
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., FBI Results - No Prior Arrest"
               />
+            </div>
+
+            {/* Flag and Notes in same row */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-start">
+              <div className="flex items-center pt-6">
+                <input
+                  type="checkbox"
+                  id="flag"
+                  checked={formData.flag}
+                  onChange={(e) => setFormData({...formData, flag: e.target.checked})}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="flag" className="ml-2 block text-xs text-gray-900">
+                  Flag for follow-up
+                </label>
+              </div>
+
+              <div className="md:col-span-3">
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">
+                  Notes
+                </label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  rows={2}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Additional notes..."
+                />
+              </div>
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex space-x-4 pt-4">
+            <div className="flex space-x-3 pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {loading ? 'Adding...' : 'Add Activity'}
               </button>
               <button
                 type="button"
                 onClick={() => router.push('/admin/activity')}
-                className="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               >
                 Cancel
               </button>

@@ -349,58 +349,58 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Log Evidence</h1>
-          <p className="text-gray-600 mt-1">Record new evidence submissions</p>
+      <div className="p-4">
+        <div className="mb-3">
+          <h1 className="text-2xl font-bold text-gray-900">Log Evidence</h1>
+          <p className="text-sm text-gray-600">Record new evidence submissions</p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Success/Error Messages */}
           {success && (
-            <div className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4">
+            <div className="mb-3 rounded-lg bg-green-50 border border-green-200 p-3">
               <p className="text-sm text-green-800 font-medium">{success}</p>
             </div>
           )}
 
           {error && (
-            <div className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4">
+            <div className="mb-3 rounded-lg bg-red-50 border border-red-200 p-3">
               <p className="text-sm text-red-800 font-medium">{error}</p>
             </div>
           )}
 
-          <div className="bg-white rounded-2xl shadow-xl">
-          <div className="border-b border-gray-200 px-6 py-5">
-            <h2 className="text-xl font-bold text-gray-900">Log New Evidence</h2>
-            <p className="text-sm text-gray-600 mt-1">Record evidence received from clients</p>
+          <div className="bg-white rounded-lg shadow-lg">
+          <div className="border-b border-gray-200 px-4 py-3">
+            <h2 className="text-lg font-bold text-gray-900">Log New Evidence</h2>
+            <p className="text-xs text-gray-600">Record evidence received from clients</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-4 space-y-4">
             {/* Client Selection */}
-            <div className="bg-emerald-50 rounded-xl p-5 border border-emerald-200">
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium text-gray-700">
+            <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-medium text-gray-700">
                   Select Client from MyCase
                 </label>
                 <button
                   type="button"
                   onClick={fetchMyCaseClients}
                   disabled={loadingClients}
-                  className="px-3 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition disabled:opacity-50"
+                  className="px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded transition disabled:opacity-50"
                 >
                   {loadingClients ? 'Refreshing...' : 'Refresh'}
                 </button>
               </div>
 
               {!selectedClient ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div>
                     <input
                       type="text"
                       placeholder="Search by name (maria) or case number (E20-043)..."
                       value={clientSearch}
                       onChange={(e) => setClientSearch(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full px-3 py-1.5 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                     />
                     {clientSearch.trim().length > 0 && (
                       <p className="mt-1 text-xs text-gray-500">
@@ -414,24 +414,24 @@ export default function Dashboard() {
                   </div>
 
                   {loadingClients ? (
-                    <div className="text-center py-8 bg-white rounded-xl">
-                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
-                      <p className="mt-2 text-sm text-gray-600">
+                    <div className="text-center py-4 bg-white rounded-lg">
+                      <div className="inline-block animate-spin rounded-full h-6 w-6 border-3 border-emerald-600 border-t-transparent"></div>
+                      <p className="mt-1 text-xs text-gray-600">
                         {!cacheLoaded && isCaseNumberQuery(clientSearch)
                           ? 'Loading all cases for case number search...'
                           : 'Searching...'}
                       </p>
                     </div>
                   ) : clientSearch.trim().length === 0 ? (
-                    <div className="text-center py-8 bg-white rounded-xl">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="text-center py-4 bg-white rounded-lg">
+                      <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
-                      <p className="mt-2 text-sm text-gray-600">Start typing to search</p>
-                      <p className="mt-1 text-xs text-gray-500">Try "maria" or "E20-043"</p>
+                      <p className="mt-1 text-xs text-gray-600">Start typing to search</p>
+                      <p className="text-xs text-gray-500">Try "maria" or "E20-043"</p>
                     </div>
                   ) : mycaseClients.length > 0 ? (
-                    <div className="max-h-64 overflow-y-auto space-y-2 bg-white rounded-xl p-2">
+                    <div className="max-h-40 overflow-y-auto space-y-1 bg-white rounded-lg p-1">
                       {mycaseClients.map(client => (
                         <button
                           key={client.id}
@@ -440,29 +440,29 @@ export default function Dashboard() {
                             setSelectedClient(client)
                             setClientSearch('')
                           }}
-                          className="w-full text-left px-4 py-3 rounded-lg hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 transition"
+                          className="w-full text-left px-3 py-2 rounded hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 transition"
                         >
-                          <p className="font-medium text-gray-900">{client.name}</p>
-                          <p className="text-sm text-gray-600">Case #{client.case_number}</p>
+                          <p className="text-sm font-medium text-gray-900">{client.name}</p>
+                          <p className="text-xs text-gray-600">Case #{client.case_number}</p>
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 bg-white rounded-xl">
-                      <p className="text-sm text-gray-500">No clients match your search</p>
+                    <div className="text-center py-4 bg-white rounded-lg">
+                      <p className="text-xs text-gray-500">No clients match your search</p>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-emerald-300 shadow-sm">
+                <div className="flex items-center justify-between bg-white rounded-lg p-3 border-2 border-emerald-300">
                   <div>
-                    <p className="font-semibold text-gray-900">{selectedClient.name}</p>
-                    <p className="text-sm text-gray-600">Case #{selectedClient.case_number}</p>
+                    <p className="text-sm font-semibold text-gray-900">{selectedClient.name}</p>
+                    <p className="text-xs text-gray-600">Case #{selectedClient.case_number}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelectedClient(null)}
-                    className="text-sm text-emerald-600 hover:text-emerald-800 font-medium"
+                    className="text-xs text-emerald-600 hover:text-emerald-800 font-medium"
                   >
                     Change
                   </button>
@@ -471,10 +471,10 @@ export default function Dashboard() {
             </div>
 
             {/* Evidence Details Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Date Received */}
               <div>
-                <label htmlFor="dateReceived" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="dateReceived" className="block text-xs font-medium text-gray-700 mb-0.5">
                   Date Received
                 </label>
                 <input
@@ -483,13 +483,13 @@ export default function Dashboard() {
                   value={dateReceived}
                   onChange={(e) => setDateReceived(e.target.value)}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
 
               {/* Number of Pieces */}
               <div>
-                <label htmlFor="numPieces" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="numPieces" className="block text-xs font-medium text-gray-700 mb-0.5">
                   Number of Pieces
                 </label>
                 <input
@@ -499,13 +499,13 @@ export default function Dashboard() {
                   value={numPieces}
                   onChange={(e) => setNumPieces(parseInt(e.target.value))}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
 
               {/* Evidence Type */}
               <div>
-                <label htmlFor="evidenceType" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="evidenceType" className="block text-xs font-medium text-gray-700 mb-0.5">
                   Evidence Type
                 </label>
                 <select
@@ -513,7 +513,7 @@ export default function Dashboard() {
                   value={evidenceType}
                   onChange={(e) => setEvidenceType(e.target.value)}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   {EVIDENCE_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -527,14 +527,14 @@ export default function Dashboard() {
                     value={customEvidenceType}
                     onChange={(e) => setCustomEvidenceType(e.target.value)}
                     required
-                    className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="mt-1 w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 )}
               </div>
 
               {/* Source */}
               <div>
-                <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="source" className="block text-xs font-medium text-gray-700 mb-0.5">
                   Source
                 </label>
                 <select
@@ -542,7 +542,7 @@ export default function Dashboard() {
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   {SOURCES.map(src => (
                     <option key={src} value={src}>{src}</option>
@@ -553,47 +553,47 @@ export default function Dashboard() {
 
             {/* Notes */}
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="notes" className="block text-xs font-medium text-gray-700 mb-0.5">
                 Notes (Optional)
                 </label>
               <textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                rows={2}
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
                 placeholder="Add any additional notes..."
               />
             </div>
 
             {/* File Upload */}
-            <div className="bg-gray-50 rounded-xl p-5 border border-gray-300">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-300">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Upload Evidence Files
               </label>
               <input
                 type="file"
                 multiple
                 onChange={handleFileSelect}
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                className="w-full px-3 py-1.5 border border-gray-300 rounded-lg bg-white text-xs file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
               />
 
               {files.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm font-medium text-gray-700">Files to Upload ({files.length}):</p>
-                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs font-medium text-gray-700">Files to Upload ({files.length}):</p>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
                     {files.map((file, index) => (
-                      <div key={index} className="flex gap-2 items-center bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                      <div key={index} className="flex gap-2 items-center bg-white p-2 rounded border border-gray-200">
                         <input
                           type="text"
                           value={file.customName}
                           onChange={(e) => updateFileName(index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
                         />
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
-                          className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 text-sm font-medium transition"
+                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium transition"
                         >
                           Remove
                         </button>
@@ -605,28 +605,28 @@ export default function Dashboard() {
             </div>
 
             {/* Google Drive Folder Selection */}
-            <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium text-gray-700">
+            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-medium text-gray-700">
                   Select Google Drive Folder
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowFolderPicker(true)}
-                  className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition"
+                  className="px-2 py-0.5 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition"
                 >
                   Browse Drive
                 </button>
               </div>
 
               {selectedFolder ? (
-                <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-blue-300 shadow-sm">
-                  <div className="flex items-center space-x-3">
-                    <svg className="w-8 h-8 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                <div className="flex items-center justify-between bg-white rounded-lg p-2 border-2 border-blue-300">
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-6 h-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M7.71 3.5L1.15 15L4.58 21L11.14 9.5L7.71 3.5M8.29 3.5L11.71 9.5L18.29 9.5L14.86 3.5M8.29 20.5L11.71 14.5L18.29 14.5L14.86 20.5M14.86 3.5L18.29 9.5L21.71 15L18.29 20.5L14.86 14.5L11.43 20.5L7.71 15" />
                     </svg>
                     <div>
-                      <p className="font-medium text-gray-900">{selectedFolder.name}</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedFolder.name}</p>
                       <p className="text-xs text-gray-500">Selected folder</p>
                     </div>
                   </div>
@@ -635,31 +635,31 @@ export default function Dashboard() {
                     onClick={() => setSelectedFolder(null)}
                     className="text-gray-400 hover:text-red-600 transition"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
               ) : (
-                <div className="text-center py-6 bg-white rounded-xl">
-                  <svg className="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center py-3 bg-white rounded-lg">
+                  <svg className="mx-auto w-7 h-7 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
-                  <p className="text-sm text-gray-600">Click "Browse Drive" to select a folder</p>
+                  <p className="text-xs text-gray-600">Click "Browse Drive" to select a folder</p>
                 </div>
               )}
             </div>
 
             {/* Submit Button */}
-            <div className="pt-2">
+            <div className="pt-1">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
