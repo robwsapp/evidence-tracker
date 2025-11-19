@@ -708,6 +708,8 @@ export default function Dashboard() {
         onClose={() => setShowFolderPicker(false)}
         onSelectFolder={(folder) => setSelectedFolder(folder)}
         selectedFolderId={selectedFolder?.id}
+        initialFolderId={process.env.NEXT_PUBLIC_GDRIVE_FOLDER_ID}
+        initialFolderName="Client Files"
       />
     </div>
   )

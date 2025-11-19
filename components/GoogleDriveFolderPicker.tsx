@@ -15,6 +15,8 @@ interface GoogleDriveFolderPickerProps {
   onClose: () => void
   onSelectFolder: (folder: Folder) => void
   selectedFolderId?: string
+  initialFolderId?: string
+  initialFolderName?: string
 }
 
 export default function GoogleDriveFolderPicker({
@@ -22,12 +24,17 @@ export default function GoogleDriveFolderPicker({
   onClose,
   onSelectFolder,
   selectedFolderId,
+  initialFolderId,
+  initialFolderName,
 }: GoogleDriveFolderPickerProps) {
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [currentPath, setCurrentPath] = useState<{ id: string; name: string }[]>([
-    { id: 'root', name: 'My Drive' }
+    {
+      id: initialFolderId || 'root',
+      name: initialFolderName || 'My Drive'
+    }
   ])
   const [googleConnected, setGoogleConnected] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
