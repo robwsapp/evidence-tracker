@@ -301,12 +301,6 @@ export default function AdminDashboard() {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => router.push('/admin/activity')}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition shadow-md"
-              >
-                Activity Log
-              </button>
-              <button
                 onClick={() => router.push('/dashboard')}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition shadow-sm"
               >
