@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import GoogleDriveFolderPicker from '@/components/GoogleDriveFolderPicker'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export const dynamic = 'force-dynamic'
 
@@ -347,49 +348,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl flex items-center justify-center shadow-md">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Evidence Tracker</h1>
-                <p className="text-xs text-gray-600">Elizabeth Rosario Law</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-700">{userEmail}</span>
-              <button
-                onClick={() => router.push('/reports')}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition"
-              >
-                Reports
-              </button>
-              <button
-                onClick={() => router.push('/admin')}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition"
-              >
-                Admin
-              </button>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
+    <DashboardLayout>
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Log Evidence</h1>
+          <p className="text-gray-600 mt-1">Record new evidence submissions</p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-4xl mx-auto">
         {/* Success/Error Messages */}
         {success && (
           <div className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4">
@@ -706,17 +672,17 @@ export default function Dashboard() {
             </div>
           </form>
         </div>
-      </main>
 
-      {/* Google Drive Folder Picker Modal */}
-      <GoogleDriveFolderPicker
-        isOpen={showFolderPicker}
-        onClose={() => setShowFolderPicker(false)}
-        onSelectFolder={(folder) => setSelectedFolder(folder)}
-        selectedFolderId={selectedFolder?.id}
-        initialFolderId={process.env.NEXT_PUBLIC_GDRIVE_FOLDER_ID}
-        initialFolderName="Client Files"
-      />
-    </div>
+        {/* Google Drive Folder Picker Modal */}
+        <GoogleDriveFolderPicker
+          isOpen={showFolderPicker}
+          onClose={() => setShowFolderPicker(false)}
+          onSelectFolder={(folder) => setSelectedFolder(folder)}
+          selectedFolderId={selectedFolder?.id}
+          initialFolderId={process.env.NEXT_PUBLIC_GDRIVE_FOLDER_ID}
+          initialFolderName="Client Files"
+        />
+      </div>
+    </DashboardLayout>
   )
 }

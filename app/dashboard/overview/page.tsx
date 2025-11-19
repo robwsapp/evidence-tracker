@@ -41,6 +41,19 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true)
   const [evidenceLogs, setEvidenceLogs] = useState<EvidenceLog[]>([])
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([])
+  const [filteredEvidenceLogs, setFilteredEvidenceLogs] = useState<EvidenceLog[]>([])
+  const [filteredActivityLogs, setFilteredActivityLogs] = useState<ActivityLog[]>([])
+
+  // Filter states
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date()
+    date.setDate(date.getDate() - 30) // Last 30 days
+    return date.toISOString().split('T')[0]
+  })
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+  const [evidenceTypeFilter, setEvidenceTypeFilter] = useState('')
+  const [sourceFilter, setSourceFilter] = useState('')
+  const [activityTypeFilter, setActivityTypeFilter] = useState('')
 
   // Stats
   const [totalEvidence, setTotalEvidence] = useState(0)
@@ -52,6 +65,10 @@ export default function OverviewPage() {
     checkUser()
     fetchData()
   }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [evidenceLogs, activityLogs, startDate, endDate, evidenceTypeFilter, sourceFilter, activityTypeFilter])
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -82,24 +99,6 @@ export default function OverviewPage() {
       setEvidenceLogs(evidenceData || [])
       setActivityLogs(activityData || [])
 
-      // Calculate stats
-      const totalEv = evidenceData?.length || 0
-      const totalP = evidenceData?.reduce((sum, log) => sum + log.num_pieces, 0) || 0
-      const totalAct = activityData?.length || 0
-
-      // This week evidence
-      const today = new Date()
-      const monday = new Date(today)
-      monday.setDate(today.getDate() - today.getDay() + 1)
-      const mondayStr = monday.toISOString().split('T')[0]
-
-      const thisWeek = evidenceData?.filter(log => log.date_received >= mondayStr).length || 0
-
-      setTotalEvidence(totalEv)
-      setTotalPieces(totalP)
-      setTotalActivities(totalAct)
-      setThisWeekEvidence(thisWeek)
-
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -107,36 +106,86 @@ export default function OverviewPage() {
     }
   }
 
-  // Prepare data for Evidence Growth chart (last 30 days)
-  const getEvidenceGrowthData = () => {
-    const last30Days = []
+  const applyFilters = () => {
+    let filteredEvidence = [...evidenceLogs]
+    let filteredActivity = [...activityLogs]
+
+    // Apply date filters
+    if (startDate) {
+      filteredEvidence = filteredEvidence.filter(log => log.date_received >= startDate)
+      filteredActivity = filteredActivity.filter(log => log.date_received >= startDate)
+    }
+    if (endDate) {
+      filteredEvidence = filteredEvidence.filter(log => log.date_received <= endDate)
+      filteredActivity = filteredActivity.filter(log => log.date_received <= endDate)
+    }
+
+    // Apply evidence type filter
+    if (evidenceTypeFilter) {
+      filteredEvidence = filteredEvidence.filter(log => log.evidence_type === evidenceTypeFilter)
+    }
+
+    // Apply source filter
+    if (sourceFilter) {
+      filteredEvidence = filteredEvidence.filter(log => log.source === sourceFilter)
+    }
+
+    // Apply activity type filter
+    if (activityTypeFilter) {
+      filteredActivity = filteredActivity.filter(log => log.activity_type === activityTypeFilter)
+    }
+
+    setFilteredEvidenceLogs(filteredEvidence)
+    setFilteredActivityLogs(filteredActivity)
+
+    // Calculate stats from filtered data
+    const totalEv = filteredEvidence.length
+    const totalP = filteredEvidence.reduce((sum, log) => sum + log.num_pieces, 0)
+    const totalAct = filteredActivity.length
+
+    // This week evidence
     const today = new Date()
+    const monday = new Date(today)
+    monday.setDate(today.getDate() - today.getDay() + 1)
+    const mondayStr = monday.toISOString().split('T')[0]
 
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(today.getDate() - i)
-      const dateStr = date.toISOString().split('T')[0]
+    const thisWeek = filteredEvidence.filter(log => log.date_received >= mondayStr).length
 
-      const count = evidenceLogs.filter(log => log.date_received === dateStr).length
-      const pieces = evidenceLogs
+    setTotalEvidence(totalEv)
+    setTotalPieces(totalP)
+    setTotalActivities(totalAct)
+    setThisWeekEvidence(thisWeek)
+  }
+
+  // Prepare data for Evidence Growth chart
+  const getEvidenceGrowthData = () => {
+    const result = []
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0]
+
+      const count = filteredEvidenceLogs.filter(log => log.date_received === dateStr).length
+      const pieces = filteredEvidenceLogs
         .filter(log => log.date_received === dateStr)
         .reduce((sum, log) => sum + log.num_pieces, 0)
 
-      last30Days.push({
-        date: `${date.getMonth() + 1}/${date.getDate()}`,
+      result.push({
+        date: `${d.getMonth() + 1}/${d.getDate()}`,
         evidence: count,
         pieces
       })
     }
 
-    return last30Days
+    return result
   }
 
   // Prepare data for Evidence by Type chart
   const getEvidenceByTypeData = () => {
     const typeCounts: { [key: string]: number } = {}
 
-    evidenceLogs.forEach(log => {
+    filteredEvidenceLogs.forEach(log => {
       typeCounts[log.evidence_type] = (typeCounts[log.evidence_type] || 0) + 1
     })
 
@@ -150,7 +199,7 @@ export default function OverviewPage() {
   const getEvidenceBySourceData = () => {
     const sourceCounts: { [key: string]: number } = {}
 
-    evidenceLogs.forEach(log => {
+    filteredEvidenceLogs.forEach(log => {
       sourceCounts[log.source] = (sourceCounts[log.source] || 0) + 1
     })
 
@@ -161,21 +210,106 @@ export default function OverviewPage() {
   const getActivityTypeData = () => {
     const activityCounts: { [key: string]: number } = {}
 
-    activityLogs.forEach(log => {
+    filteredActivityLogs.forEach(log => {
       activityCounts[log.activity_type] = (activityCounts[log.activity_type] || 0) + 1
     })
 
     return Object.entries(activityCounts).map(([type, count]) => ({ name: type, value: count }))
   }
 
+  // Get unique values for dropdowns
+  const uniqueEvidenceTypes = Array.from(new Set(evidenceLogs.map(log => log.evidence_type)))
+  const uniqueSources = Array.from(new Set(evidenceLogs.map(log => log.source)))
+  const uniqueActivityTypes = Array.from(new Set(activityLogs.map(log => log.activity_type)))
+
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
   return (
     <DashboardLayout>
       <div className="p-6">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-gray-600 mt-1">Evidence tracking and analytics</p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+            <button
+              onClick={() => {
+                const date = new Date()
+                date.setDate(date.getDate() - 30)
+                setStartDate(date.toISOString().split('T')[0])
+                setEndDate(new Date().toISOString().split('T')[0])
+                setEvidenceTypeFilter('')
+                setSourceFilter('')
+                setActivityTypeFilter('')
+              }}
+              className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+            >
+              Reset Filters
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Evidence Type</label>
+              <select
+                value={evidenceTypeFilter}
+                onChange={(e) => setEvidenceTypeFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="">All Types</option>
+                {uniqueEvidenceTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="">All Sources</option>
+                {uniqueSources.map(source => (
+                  <option key={source} value={source}>{source}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Activity Type</label>
+              <select
+                value={activityTypeFilter}
+                onChange={(e) => setActivityTypeFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="">All Activity Types</option>
+                {uniqueActivityTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {loading ? (
