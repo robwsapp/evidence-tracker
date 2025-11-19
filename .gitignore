@@ -38,3 +38,4 @@ mycase_tokens.json
 
 # google credentials
 credentials.json
+client_secret_*.json
