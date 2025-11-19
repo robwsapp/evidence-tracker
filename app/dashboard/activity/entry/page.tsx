@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export const dynamic = 'force-dynamic'
 
@@ -124,37 +125,14 @@ export default function ActivityEntryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-900">Add Activity Log Entry</h1>
-              <button
-                onClick={() => router.push('/admin/activity')}
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
-                ← Back to Activity Log
-              </button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">{userEmail}</span>
-              <button
-                onClick={async () => {
-                  await supabase.auth.signOut()
-                  router.push('/login')
-                }}
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
+    <DashboardLayout>
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Add Activity Log Entry</h1>
+          <p className="text-gray-600 mt-1">Record new FBI results or case processing activities</p>
         </div>
-      </nav>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm p-6">
           {success && (
             <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
@@ -356,7 +334,8 @@ export default function ActivityEntryPage() {
             </div>
           </form>
         </div>
-      </main>
-    </div>
+        </div>
+      </div>
+    </DashboardLayout>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export const dynamic = 'force-dynamic'
 
@@ -138,35 +139,15 @@ export default function DailyStatsEntryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-900">Daily Stats Entry</h1>
-              <button
-                onClick={() => router.push('/reports')}
-                className="text-sm text-blue-600 hover:text-blue-800"
-              >
-                ← Back to Reports
-              </button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">{userEmail}</span>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
+    <DashboardLayout>
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Daily Stats Entry</h1>
+          <p className="text-gray-600 mt-1">Enter daily statistics for reporting</p>
         </div>
-      </nav>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm p-6">
           {success && (
             <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
               <p className="text-sm text-green-800">{success}</p>
@@ -324,8 +305,9 @@ export default function DailyStatsEntryPage() {
               </button>
             </div>
           </form>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   )
 }

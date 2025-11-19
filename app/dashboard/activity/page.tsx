@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export const dynamic = 'force-dynamic'
 
@@ -173,50 +174,20 @@ export default function ActivityLogPage() {
   const uniqueHandlers = Array.from(new Set(logs.map(log => log.handler)))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Activity Log</h1>
-                <p className="text-sm text-gray-600">FBI Results & Case Processing</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => router.push('/admin/activity/entry')}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition shadow-md"
-              >
-                Add Activity
-              </button>
-              <button
-                onClick={() => router.push('/admin')}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition shadow-sm"
-              >
-                Back to Admin
-              </button>
-              <button
-                onClick={async () => {
-                  await supabase.auth.signOut()
-                  router.push('/login')
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition shadow-md"
-              >
-                Logout
-              </button>
-            </div>
+    <DashboardLayout>
+      <div className="p-6">
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Activity Log</h1>
+            <p className="text-gray-600 mt-1">FBI Results & Case Processing</p>
           </div>
+          <button
+            onClick={() => router.push('/dashboard/activity/entry')}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-md"
+          >
+            Add Activity
+          </button>
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
@@ -446,7 +417,7 @@ export default function ActivityLogPage() {
             )}
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   )
 }

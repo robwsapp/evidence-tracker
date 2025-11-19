@@ -356,20 +356,20 @@ export default function Dashboard() {
         </div>
 
         <div className="max-w-4xl mx-auto">
-        {/* Success/Error Messages */}
-        {success && (
-          <div className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4">
-            <p className="text-sm text-green-800 font-medium">{success}</p>
-          </div>
-        )}
+          {/* Success/Error Messages */}
+          {success && (
+            <div className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4">
+              <p className="text-sm text-green-800 font-medium">{success}</p>
+            </div>
+          )}
 
-        {error && (
-          <div className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4">
-            <p className="text-sm text-red-800 font-medium">{error}</p>
-          </div>
-        )}
+          {error && (
+            <div className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4">
+              <p className="text-sm text-red-800 font-medium">{error}</p>
+            </div>
+          )}
 
-        <div className="bg-white rounded-2xl shadow-xl">
+          <div className="bg-white rounded-2xl shadow-xl">
           <div className="border-b border-gray-200 px-6 py-5">
             <h2 className="text-xl font-bold text-gray-900">Log New Evidence</h2>
             <p className="text-sm text-gray-600 mt-1">Record evidence received from clients</p>
@@ -671,17 +671,18 @@ export default function Dashboard() {
               </button>
             </div>
           </form>
-        </div>
+          </div>
 
-        {/* Google Drive Folder Picker Modal */}
-        <GoogleDriveFolderPicker
-          isOpen={showFolderPicker}
-          onClose={() => setShowFolderPicker(false)}
-          onSelectFolder={(folder) => setSelectedFolder(folder)}
-          selectedFolderId={selectedFolder?.id}
-          initialFolderId={process.env.NEXT_PUBLIC_GDRIVE_FOLDER_ID}
-          initialFolderName="Client Files"
-        />
+          {/* Google Drive Folder Picker Modal */}
+          <GoogleDriveFolderPicker
+            isOpen={showFolderPicker}
+            onClose={() => setShowFolderPicker(false)}
+            onSelectFolder={(folder) => setSelectedFolder(folder)}
+            selectedFolderId={selectedFolder?.id}
+            initialFolderId={process.env.NEXT_PUBLIC_GDRIVE_FOLDER_ID}
+            initialFolderName="Client Files"
+          />
+        </div>
       </div>
     </DashboardLayout>
   )
