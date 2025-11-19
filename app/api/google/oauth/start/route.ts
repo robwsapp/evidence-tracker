@@ -1,10 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function GET(request: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID
@@ -17,40 +11,18 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // Get user from cookies
-  const cookieStore = request.cookies
-  const allCookies = cookieStore.getAll()
+  // Get user ID from query parameter (passed from client)
+  const searchParams = request.nextUrl.searchParams
+  const userId = searchParams.get('userId')
 
-  // Find the auth token cookie
-  const authTokenCookie = allCookies.find(cookie =>
-    cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')
-  )
-
-  if (!authTokenCookie) {
-    console.error('[Google OAuth Start] No auth token cookie found')
+  if (!userId) {
+    console.error('[Google OAuth Start] No userId provided in query parameter')
     return NextResponse.redirect(
-      new URL('/login?error=not_logged_in', request.url)
+      new URL('/login?error=no_user_id', request.url)
     )
   }
 
-  // Parse JWT to get user ID
-  let userId: string
-  try {
-    const tokenParts = authTokenCookie.value.split('.')
-    const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
-    userId = payload.sub
-
-    if (!userId) {
-      throw new Error('No user ID in token')
-    }
-  } catch (error) {
-    console.error('[Google OAuth Start] Error parsing token:', error)
-    return NextResponse.redirect(
-      new URL('/login?error=invalid_session', request.url)
-    )
-  }
-
-  console.log('[Google OAuth Start] User ID:', userId)
+  console.log('[Google OAuth Start] User ID from query:', userId)
 
   // Google OAuth authorization URL with state parameter containing user ID
   const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')

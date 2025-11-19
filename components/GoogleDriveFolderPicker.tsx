@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 interface Folder {
   id: string
@@ -29,10 +30,19 @@ export default function GoogleDriveFolderPicker({
     { id: 'root', name: 'My Drive' }
   ])
   const [googleConnected, setGoogleConnected] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen) {
       checkGoogleConnection()
+      // Get user ID from Supabase session
+      const getUserId = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          setUserId(user.id)
+        }
+      }
+      getUserId()
     }
   }, [isOpen])
 
@@ -89,7 +99,11 @@ export default function GoogleDriveFolderPicker({
   }
 
   const handleConnectGoogle = () => {
-    window.location.href = '/api/google/oauth/start'
+    if (userId) {
+      window.location.href = `/api/google/oauth/start?userId=${userId}`
+    } else {
+      setError('Could not get user session. Please refresh and try again.')
+    }
   }
 
   const handleSelectCurrentFolder = () => {
