@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const code = searchParams.get('code')
   const error = searchParams.get('error')
+  const state = searchParams.get('state') // User ID passed from start endpoint
 
   if (error) {
     return NextResponse.redirect(
@@ -23,6 +24,16 @@ export async function GET(request: NextRequest) {
       new URL('/dashboard?google_error=no_code', request.url)
     )
   }
+
+  if (!state) {
+    console.error('[Google OAuth] No state parameter (user ID) found')
+    return NextResponse.redirect(
+      new URL('/login?google_error=no_user_id', request.url)
+    )
+  }
+
+  const userId = state
+  console.log('[Google OAuth] Received user ID from state:', userId)
 
   try {
     // Exchange authorization code for tokens
@@ -48,75 +59,34 @@ export async function GET(request: NextRequest) {
 
     const tokens = await tokenResponse.json()
 
-    // Get ALL cookies and find Supabase auth tokens
-    const cookieStore = request.cookies
-    const allCookies = cookieStore.getAll()
+    // Calculate expiration time
+    const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
 
-    // Find the auth token cookie (format: sb-<project-ref>-auth-token)
-    const authTokenCookie = allCookies.find(cookie =>
-      cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')
+    // Save tokens to database (upsert based on user_id) using service role to bypass RLS
+    const { error: dbError } = await supabase
+      .from('google_oauth_tokens')
+      .upsert({
+        user_id: userId,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expires_at: expiresAt,
+        scope: tokens.scope,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'user_id'
+      })
+
+    if (dbError) {
+      console.error('[Google OAuth] Database error:', dbError)
+      throw new Error('Failed to save tokens')
+    }
+
+    console.log('[Google OAuth] Successfully connected Google Drive for user:', userId)
+
+    // Redirect back to dashboard with success
+    return NextResponse.redirect(
+      new URL('/dashboard?google_connected=true', request.url)
     )
-
-    if (!authTokenCookie) {
-      console.error('[Google OAuth] No auth token cookie found')
-      console.error('[Google OAuth] Available cookies:', allCookies.map(c => c.name))
-      return NextResponse.redirect(
-        new URL('/login?google_error=not_logged_in', request.url)
-      )
-    }
-
-    console.log('[Google OAuth] Found auth cookie:', authTokenCookie.name)
-
-    // Parse the JWT token to get user ID (tokens are JWTs with user info)
-    try {
-      const tokenParts = authTokenCookie.value.split('.')
-      if (tokenParts.length !== 3) {
-        throw new Error('Invalid token format')
-      }
-
-      const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
-      const userId = payload.sub
-
-      if (!userId) {
-        throw new Error('No user ID in token')
-      }
-
-      console.log('[Google OAuth] Extracted user ID:', userId)
-
-      // Calculate expiration time
-      const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
-
-      // Save tokens to database (upsert based on user_id) using service role to bypass RLS
-      const { error: dbError } = await supabase
-        .from('google_oauth_tokens')
-        .upsert({
-          user_id: userId,
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-          expires_at: expiresAt,
-          scope: tokens.scope,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id'
-        })
-
-      if (dbError) {
-        console.error('[Google OAuth] Database error:', dbError)
-        throw new Error('Failed to save tokens')
-      }
-
-      console.log('[Google OAuth] Successfully connected Google Drive')
-
-      // Redirect back to dashboard with success
-      return NextResponse.redirect(
-        new URL('/dashboard?google_connected=true', request.url)
-      )
-    } catch (parseError: any) {
-      console.error('[Google OAuth] Error parsing auth token:', parseError)
-      return NextResponse.redirect(
-        new URL('/login?google_error=invalid_session', request.url)
-      )
-    }
 
   } catch (err: any) {
     console.error('[Google OAuth] Error:', err)
