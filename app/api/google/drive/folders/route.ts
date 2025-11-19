@@ -64,31 +64,25 @@ async function refreshTokenIfNeeded(tokens: GoogleTokens): Promise<GoogleTokens>
 
 export async function GET(request: NextRequest) {
   try {
-    // Get current user from cookie
-    const cookieStore = request.cookies
-    const accessToken = cookieStore.get('sb-humvvanizmkssuzsueet-auth-token')
+    // Get user ID from query parameter (passed from client)
+    const searchParams = request.nextUrl.searchParams
+    const userId = searchParams.get('userId')
 
-    if (!accessToken) {
+    if (!userId) {
+      console.error('[Google Drive] No userId provided')
       return NextResponse.json(
         { error: 'Not authenticated' },
         { status: 401 }
       )
     }
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken.value)
+    console.log('[Google Drive] Fetching folders for user:', userId)
 
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
-
-    // Get Google tokens from database
+    // Get Google tokens from database using service role (bypasses RLS)
     const { data: tokenData, error: tokenError } = await supabase
       .from('google_oauth_tokens')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
     if (tokenError || !tokenData) {
@@ -112,7 +106,6 @@ export async function GET(request: NextRequest) {
     // Refresh token if needed
     tokens = await refreshTokenIfNeeded(tokens)
 
-    const searchParams = request.nextUrl.searchParams
     const parentId = searchParams.get('parent') || 'root'
 
     // List folders in the specified parent folder

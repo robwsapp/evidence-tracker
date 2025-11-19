@@ -64,31 +64,25 @@ async function refreshTokenIfNeeded(tokens: GoogleTokens): Promise<GoogleTokens>
 
 export async function POST(request: NextRequest) {
   try {
-    // Get current user from cookie
-    const cookieStore = request.cookies
-    const accessToken = cookieStore.get('sb-humvvanizmkssuzsueet-auth-token')
+    // Parse multipart form data first to get userId
+    const formData = await request.formData()
+    const userId = formData.get('userId') as string
 
-    if (!accessToken) {
+    if (!userId) {
+      console.error('[Google Drive] No userId provided')
       return NextResponse.json(
         { error: 'Not authenticated' },
         { status: 401 }
       )
     }
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken.value)
+    console.log('[Google Drive] Uploading file for user:', userId)
 
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
-
-    // Get Google tokens from database
+    // Get Google tokens from database using service role (bypasses RLS)
     const { data: tokenData, error: tokenError } = await supabase
       .from('google_oauth_tokens')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
     if (tokenError || !tokenData) {
@@ -112,8 +106,7 @@ export async function POST(request: NextRequest) {
     // Refresh token if needed
     tokens = await refreshTokenIfNeeded(tokens)
 
-    // Parse multipart form data
-    const formData = await request.formData()
+    // Get file data from form (already parsed above)
     const file = formData.get('file') as File
     const folderId = formData.get('folderId') as string
     const fileName = formData.get('fileName') as string

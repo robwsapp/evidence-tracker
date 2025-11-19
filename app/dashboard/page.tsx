@@ -49,6 +49,7 @@ const SOURCES = [
 export default function Dashboard() {
   const router = useRouter()
   const [userEmail, setUserEmail] = useState('')
+  const [userId, setUserId] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
@@ -118,6 +119,7 @@ export default function Dashboard() {
     }
 
     setUserEmail(session.user.email || '')
+    setUserId(session.user.id)
   }
 
   const handleLogout = async () => {
@@ -289,6 +291,7 @@ export default function Dashboard() {
         formData.append('file', uploadFile.file)
         formData.append('folderId', selectedFolder.id)
         formData.append('fileName', uploadFile.customName)
+        formData.append('userId', userId)
 
         const uploadResponse = await fetch('/api/google/drive/upload', {
           method: 'POST',

@@ -34,7 +34,6 @@ export default function GoogleDriveFolderPicker({
 
   useEffect(() => {
     if (isOpen) {
-      checkGoogleConnection()
       // Get user ID from Supabase session
       const getUserId = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -47,14 +46,22 @@ export default function GoogleDriveFolderPicker({
   }, [isOpen])
 
   useEffect(() => {
-    if (isOpen && googleConnected) {
+    if (isOpen && userId) {
+      checkGoogleConnection()
+    }
+  }, [isOpen, userId])
+
+  useEffect(() => {
+    if (isOpen && googleConnected && userId) {
       loadFolders(currentPath[currentPath.length - 1].id)
     }
-  }, [currentPath, isOpen, googleConnected])
+  }, [currentPath, isOpen, googleConnected, userId])
 
   const checkGoogleConnection = async () => {
+    if (!userId) return
+
     try {
-      const response = await fetch('/api/google/drive/folders?parent=root')
+      const response = await fetch(`/api/google/drive/folders?parent=root&userId=${userId}`)
       if (response.status === 401) {
         const data = await response.json()
         if (data.needsOAuth) {
@@ -70,11 +77,13 @@ export default function GoogleDriveFolderPicker({
   }
 
   const loadFolders = async (parentId: string) => {
+    if (!userId) return
+
     setLoading(true)
     setError('')
 
     try {
-      const response = await fetch(`/api/google/drive/folders?parent=${parentId}`)
+      const response = await fetch(`/api/google/drive/folders?parent=${parentId}&userId=${userId}`)
 
       if (!response.ok) {
         const data = await response.json()
